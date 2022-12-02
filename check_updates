@@ -1,4 +1,4 @@
-#!perl
+#!/usr/bin/perl
 
 # nagios: -epn
 
@@ -794,16 +794,24 @@ sub check_yum {
 
             if ( @security_updates > 0 ) {
 
-                if ( !$options->get('number-only') ) {
+                if ( $options->get('number-only') ) {
 
-                 # every update is critical since it could be a security problem
-                    verbose
-"no security plugin: every update could be a security problem\n";
-                    $status = Monitoring::Plugin->CRITICAL;
+                # every update is critical since it could be a security problem
+                        #  verbose
+                        #"no security plugin: every update could be a security problem\n";
+                        #                   $status = Monitoring::Plugin->CRITICAL;
+                        #              }
+                #             else {
+                verbose
+                "Security updates available but --number-only was specified\n";
+
+                if ( @security_updates >= $options->get('warning') ) {
+                        $status = Monitoring::Plugin->WARNING;
                 }
-                else {
-                    verbose
-"Security updates available but --number-only was specified\n";
+                if ( @security_updates >= $options->get('critical') ) {
+                        $status = Monitoring::Plugin->CRITICAL;
+                }
+
                 }
 
                 $message = ( scalar @security_updates ) . ' security update';
@@ -1112,11 +1120,11 @@ sub run {
     }
 
     # check bootcheck consistencys
-    if ( $options->get('number-only') && $options->get('security-only') ) {
-        exit_with_error( Monitoring::Plugin->UNKNOWN,
-            'Error --security-only and --number-only specified at the same time'
-        );
-    }
+    #if ( $options->get('number-only') && $options->get('security-only') ) {
+    #    exit_with_error( Monitoring::Plugin->UNKNOWN,
+    #        'Error --security-only and --number-only specified at the same time'
+    #    );
+    #}
 
     ############
     # YUM or DNF
